@@ -41,6 +41,7 @@ Distinct Counts for Aggregate Columns
 |state     |26           |
 
 Distribution Count for Aggregate Columns
+
 ======== Distribution for - occupation ========
 
 |occupation    |count|
