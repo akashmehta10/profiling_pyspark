@@ -7,6 +7,8 @@ Data profiling is the process of examining the data available from an existing i
 - Distribution counts for aggregated columns
 - Percentage of data quality issues for columns 
  
+ Full Description: https://medium.com/@akashmehta10/data-profiling-data-quality-in-spark-big-data-with-pluggable-code-a75fbff9865
+ 
 NULL/Empty Percentage for Columns
 
 |Column        |NullPercentage|
