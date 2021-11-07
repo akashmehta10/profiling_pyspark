@@ -4,7 +4,7 @@ from pyspark.sql import SparkSession
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import functions as F
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
-from profile_lib_v2 import get_null_perc, get_summary_numeric, get_distinct_counts, get_distribution_counts, get_mismatch_perc
+from profile_lib import get_null_perc, get_summary_numeric, get_distinct_counts, get_distribution_counts, get_mismatch_perc
 
 conf = SparkConf()
 conf.set('set hive.vectorized.execution', 'true')
