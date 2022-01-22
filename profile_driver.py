@@ -15,7 +15,7 @@ conf.set('set hive.stats.fetch.column.stats','true')
 conf.set('set hive.stats.fetch.partition.stats', 'true')
 conf.set('spark.cleaner.referenceTracking.cleanCheckpoints', 'true')
 
-spark = SparkSession.builder.appName("scd_driver_program").config(conf=conf).enableHiveSupport().getOrCreate()
+spark = SparkSession.builder.appName("profile_driver_program").config(conf=conf).enableHiveSupport().getOrCreate()
 spark.sql('set hive.exec.dynamic.partition=True')
 spark.sql('set hive.exec.dynamic.partition.mode=nonstrict')
 
