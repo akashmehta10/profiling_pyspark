@@ -34,11 +34,14 @@ schema = StructType([
 		 	])
 
 df = spark.read.format('csv').option("header", False).schema(schema).load("/tmp/profile.csv")
+
+# ONLY pass NULLABLE columns, for example: Strings, Maps, Timestamps, etc.
+# DO NOT pass NON-NULLABLE columns, for example: Ints, Decimals, Doubles, etc.
 null_cols = ['gender','age','education','occupation','income','street_address','city','state']
 numeric_cols = ['age', 'income']
 aggregate_cols = ['occupation','state']
 data_quality_cols_regex = {'age': '^[0-99]{1,2}$', 'first_name': '^[a-zA-Z]*$', 'gender': '^M(ale)?$|^F(emale)?$'}
-result_limit = 10
+result_limit = 100
 # List of commonly used regex: https://digitalfortress.tech/js/top-15-commonly-used-regex/
 
 ### 1. NULL Checks

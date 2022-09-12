@@ -18,15 +18,15 @@ def get_null_perc(spark, df, null_cols):
     schema = StructType([ \
         StructField("Column",StringType(),True), \
         StructField("NullPercentage",StringType(),True)
-      ])
+    ])
     emptyRDD = spark.sparkContext.emptyRDD()
     resultdf = spark.createDataFrame(emptyRDD, schema=schema)
-    
-    for x in null_cols:
-    	df_null_count = df.select(F.col(x)).filter(F.col(x).isNull() | (F.col(x) == '')).count()
-    	df_null = spark.createDataFrame([[x, str(df_null_count*100.0/df.count()) + '%' ]],schema=schema)
-    	resultdf = resultdf.union(df_null)
 
+    for x in null_cols:
+        if x.upper() in (name.upper() for name in df.columns):
+            df_null_count = df.select(F.col(x)).filter(F.col(x).isNull() | (F.col(x) == '')).count()
+            df_null = spark.createDataFrame([[x, str(df_null_count*100.0/df.count()) + '%' ]],schema=schema)
+            resultdf = resultdf.union(df_null)
     return resultdf
 
 def get_summary_numeric(df, numeric_cols):
@@ -39,7 +39,9 @@ def get_summary_numeric(df, numeric_cols):
     Returns:
         DataFrame: dataframe with summary analysis
     """
-
+    for x in numeric_cols:
+        if x.upper() not in (name.upper() for name in df.columns):
+            numeric_cols.remove(x)
     return df.select(numeric_cols).summary()
 
 def get_distinct_counts(spark, df, aggregate_cols):
@@ -56,15 +58,16 @@ def get_distinct_counts(spark, df, aggregate_cols):
     schema = StructType([ \
         StructField("Column",StringType(),True), \
         StructField("DistinctCount",StringType(),True)
-      ])
-    
+    ])
+
     emptyRDD = spark.sparkContext.emptyRDD()
     resultdf = spark.createDataFrame(emptyRDD, schema=schema)
-    
+
     for x in aggregate_cols:
-    	df_distinct_count = df.select(F.col(x)).distinct().count()
-    	df_distinct = spark.createDataFrame([[x, str(df_distinct_count)]],schema=schema)
-    	resultdf = resultdf.union(df_distinct)
+        if x.upper() in (name.upper() for name in df.columns):
+            df_distinct_count = df.select(F.col(x)).distinct().count()
+            df_distinct = spark.createDataFrame([[x, str(df_distinct_count)]],schema=schema)
+            resultdf = resultdf.union(df_distinct)
 
     return resultdf
 
@@ -80,10 +83,11 @@ def get_distribution_counts(spark, df, aggregate_cols):
         Array: Array of objects with dataframes
     """
     result = []
-    for i in aggregate_cols:
-    	result.append(df.groupby(F.col(i)).count().sort(F.col("count").desc()))
+    for x in aggregate_cols:
+        if x.upper() in (name.upper() for name in df.columns):
+            result.append(df.groupby(F.col(x)).count().sort(F.col("count").desc()))
     ###
-    
+
     return result
 
 def get_mismatch_perc(spark, df, data_quality_cols_regex):
@@ -100,15 +104,16 @@ def get_mismatch_perc(spark, df, data_quality_cols_regex):
     schema = StructType([ \
         StructField("Column",StringType(),True), \
         StructField("MismatchPercentage",StringType(),True)
-      ])
-    
+    ])
+
     emptyRDD = spark.sparkContext.emptyRDD()
     resultdf = spark.createDataFrame(emptyRDD, schema=schema)
-    
-    
+
+
     for key, value in data_quality_cols_regex.items():
-    	df_regex_not_like_count = df.select(F.col(key)).filter(~F.col(key).rlike(value)).count()
-    	df_regex_not_like = spark.createDataFrame([[key, str(df_regex_not_like_count*100.0/df.count()) + '%']],schema=schema)
-    	resultdf = resultdf.union(df_regex_not_like)
-    
+        if key.upper() in (name.upper() for name in df.columns):
+            df_regex_not_like_count = df.select(F.col(key)).filter(~F.col(key).rlike(value)).count()
+            df_regex_not_like = spark.createDataFrame([[key, str(df_regex_not_like_count*100.0/df.count()) + '%']],schema=schema)
+            resultdf = resultdf.union(df_regex_not_like)
+
     return resultdf
