@@ -22,10 +22,11 @@ def get_null_perc(spark, df, null_cols):
     emptyRDD = spark.sparkContext.emptyRDD()
     resultdf = spark.createDataFrame(emptyRDD, schema=schema)
 
+    df_count = df.count()
     for x in null_cols:
         if x.upper() in (name.upper() for name in df.columns):
             df_null_count = df.select(F.col(x)).filter(F.col(x).isNull() | (F.col(x) == '')).count()
-            df_null = spark.createDataFrame([[x, str(df_null_count*100.0/df.count()) + '%' ]],schema=schema)
+            df_null = spark.createDataFrame([[x, str(df_null_count*100.0/df_count) + '%' ]],schema=schema)
             resultdf = resultdf.union(df_null)
     return resultdf
 
@@ -109,11 +110,11 @@ def get_mismatch_perc(spark, df, data_quality_cols_regex):
     emptyRDD = spark.sparkContext.emptyRDD()
     resultdf = spark.createDataFrame(emptyRDD, schema=schema)
 
-
+    df_count = df.count()
     for key, value in data_quality_cols_regex.items():
         if key.upper() in (name.upper() for name in df.columns):
             df_regex_not_like_count = df.select(F.col(key)).filter(~F.col(key).rlike(value)).count()
-            df_regex_not_like = spark.createDataFrame([[key, str(df_regex_not_like_count*100.0/df.count()) + '%']],schema=schema)
+            df_regex_not_like = spark.createDataFrame([[key, str(df_regex_not_like_count*100.0/df_count) + '%']],schema=schema)
             resultdf = resultdf.union(df_regex_not_like)
 
     return resultdf
